@@ -1,4 +1,4 @@
-# app/controllers/products_controller.rb - Better approach avoiding unnecessary joins:
+# app/controllers/products_controller.rb - Update the show method:
 
 class ProductsController < ApplicationController
   before_action :set_product, only: [:show]
@@ -37,16 +37,24 @@ class ProductsController < ApplicationController
   end
 
   def show
-    @related_products = Product.active
-                              .joins(:categories)
-                              .where(categories: { id: @product.categories.ids })
-                              .where.not(id: @product.id)
-                              .limit(4)
+    # Find related products based on shared categories
+    if @product.categories.any?
+      @related_products = Product.active
+                                .joins(:categories)
+                                .where(categories: { id: @product.categories.ids })
+                                .where.not(id: @product.id)
+                                .distinct
+                                .limit(4)
+    else
+      @related_products = Product.active.where.not(id: @product.id).limit(4)
+    end
   end
 
   private
 
   def set_product
     @product = Product.active.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to products_path, alert: "Product not found or no longer available."
   end
 end

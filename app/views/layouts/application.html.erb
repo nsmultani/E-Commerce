@@ -3,7 +3,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= @page&.title || @product&.name || "Northern Lights Outdoor Gear" %></title>
+<title>
+  <% if @product %>
+    <%= @product.name %> - Northern Lights Outdoor Gear
+  <% elsif @category %>
+    <%= @category.name %> - Northern Lights Outdoor Gear
+  <% elsif @page %>
+    <%= @page.title %>
+  <% else %>
+    Northern Lights Outdoor Gear - Premium Outdoor Equipment
+  <% end %>
+</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="<%= @page&.meta_description || @product&.name || 'Northern Lights Outdoor Gear - Premium outdoor equipment and adventure gear in Winnipeg, Manitoba.' %>">
     <%= csrf_meta_tags %>
