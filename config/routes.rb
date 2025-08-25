@@ -14,6 +14,11 @@ Rails.application.routes.draw do
   delete 'cart/remove/:product_id', to: 'shopping_cart#remove_item', as: 'cart_remove'
   delete 'cart/clear', to: 'shopping_cart#clear', as: 'cart_clear'
   
+  # Checkout routes
+  get 'checkout', to: 'checkouts#new', as: 'checkout'
+  post 'checkout', to: 'checkouts#create'
+  get 'checkout/success/:id', to: 'checkouts#success', as: 'checkout_success'
+
   # Category routes
   resources :categories, only: [:index, :show], param: :slug
   

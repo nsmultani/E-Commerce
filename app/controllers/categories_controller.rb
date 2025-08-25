@@ -25,6 +25,7 @@ class CategoriesController < ApplicationController
     
     # Use Kaminari for pagination
     @products = @products.order('products.name').page(params[:page]).per(12)
+    @total_count = @products.total_count
   end
 
   private

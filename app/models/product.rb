@@ -7,6 +7,9 @@ class Product < ApplicationRecord
   # Many-to-many relationship with categories
   has_many :product_categories, dependent: :destroy
   has_many :categories, through: :product_categories
+
+  has_many :order_items
+  has_many :orders, through: :order_items
   
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
   validates :sku, presence: true, uniqueness: true, format: { with: /\A[A-Z0-9\-_]+\z/i }
