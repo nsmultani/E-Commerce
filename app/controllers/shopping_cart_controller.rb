@@ -1,4 +1,3 @@
-# app/controllers/shopping_cart_controller.rb
 
 class ShoppingCartController < ApplicationController
   before_action :initialize_cart
