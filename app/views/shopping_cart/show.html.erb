@@ -1,11 +1,11 @@
-<!-- app/views/shopping_cart/show.html.erb - Fix all the route paths: -->
+<!-- app/views/shopping_cart/show.html.erb - Enhanced quantity editing: -->
 
 <div class="shopping-cart" style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
   
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #3498db; padding-bottom: 15px;">
     <h1 style="color: #2c3e50; margin: 0;">Shopping Cart</h1>
     <% unless current_cart.empty? %>
-      <%= link_to "Clear Cart", clear_cart_path, method: :delete, 
+      <%= link_to "Clear Cart", cart_clear_path, method: :delete, 
                   confirm: "Are you sure you want to clear your cart?",
                   style: "color: #e74c3c; text-decoration: none; font-size: 14px;" %>
     <% end %>
@@ -32,13 +32,15 @@
           
           <!-- Product Image -->
           <div>
-            <% if product.primary_image.present? %>
-              <%= image_tag product.primary_image, alt: product.name, 
-                          style: "width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;" %>
-            <% else %>
-              <div style="width: 80px; height: 80px; background-color: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #7f8c8d; font-size: 12px;">
-                No Image
-              </div>
+            <%= link_to product_path(product) do %>
+              <% if product.primary_image.present? %>
+                <%= image_tag product.primary_image, alt: product.name, 
+                            style: "width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;" %>
+              <% else %>
+                <div style="width: 80px; height: 80px; background-color: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #7f8c8d; font-size: 12px;">
+                  No Image
+                </div>
+              <% end %>
             <% end %>
           </div>
           
@@ -50,33 +52,73 @@
             <div style="color: #7f8c8d; font-size: 14px; margin-bottom: 5px;">
               SKU: <%= product.sku %>
             </div>
-            <div style="color: #7f8c8d; font-size: 14px;">
-              <%= number_to_currency(product.display_price) %> each
+            <div style="color: #7f8c8d; font-size: 14px; margin-bottom: 5px;">
+              Unit Price: <%= number_to_currency(product.display_price) %>
+            </div>
+            <div style="color: #7f8c8d; font-size: 12px;">
+              <%= truncate(product.description, length: 80) %>
             </div>
           </div>
           
-          <!-- Quantity Controls -->
-          <div style="text-align: center;">
-            <%= form_with url: update_cart_item_path, method: :patch, local: true, style: "display: flex; align-items: center; gap: 5px;" do |f| %>
-              <%= f.hidden_field :product_id, value: product.id %>
-              <%= f.number_field :quantity, value: quantity, min: 1, max: product.stock_quantity,
-                                style: "width: 60px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" %>
-              <%= f.submit "Update", style: "padding: 5px 10px; background-color: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;" %>
-            <% end %>
-          </div>
-          
-          <!-- Item Total -->
-          <div style="text-align: center; font-weight: bold; color: #2c3e50;">
-            <%= number_to_currency(item_total) %>
-          </div>
-          
-          <!-- Remove Button -->
-          <div style="text-align: center;">
-            <%= link_to "Remove", remove_cart_item_path(product_id: product.id), 
-                        method: :delete, 
-                        confirm: "Remove #{product.name} from cart?",
-                        style: "color: #e74c3c; text-decoration: none; font-size: 14px;" %>
-          </div>
+          <!-- app/views/shopping_cart/show.html.erb - Fix all form paths: -->
+
+<!-- Quantity Controls - Updated paths -->
+<div style="text-align: center;">
+  <div style="margin-bottom: 10px; font-weight: bold; color: #2c3e50;">Quantity</div>
+  
+  <!-- Quantity controls with up/down buttons -->
+  <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 10px;">
+    <!-- Decrease button -->
+    <%= form_with url: cart_update_path(product_id: product.id), method: :patch, local: true, style: "display: inline;" do |f| %>
+      <%= f.hidden_field :quantity, value: [quantity - 1, 1].max %>
+      <%= f.submit "-", style: "width: 30px; height: 30px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;" %>
+    <% end %>
+    
+    <!-- Quantity display -->
+    <span style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px; min-width: 40px; text-align: center; background-color: #f8f9fa;">
+      <%= quantity %>
+    </span>
+    
+    <!-- Increase button -->
+    <%= form_with url: cart_update_path(product_id: product.id), method: :patch, local: true, style: "display: inline;" do |f| %>
+      <%= f.hidden_field :quantity, value: [quantity + 1, product.stock_quantity].min %>
+      <%= f.submit "+", style: "width: 30px; height: 30px; background-color: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;" %>
+    <% end %>
+  </div>
+  
+  <!-- Manual quantity update form -->
+  <div style="margin-top: 10px;">
+    <%= form_with url: cart_update_path(product_id: product.id), method: :patch, local: true, style: "display: flex; align-items: center; gap: 5px; justify-content: center;" do |f| %>
+      <%= f.number_field :quantity, value: quantity, min: 1, max: product.stock_quantity,
+                        style: "width: 60px; padding: 5px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" %>
+      <%= f.submit "Update", style: "padding: 5px 10px; background-color: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;" %>
+    <% end %>
+  </div>
+  
+  <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+    Available: <%= product.stock_quantity %>
+  </div>
+</div>
+
+<!-- Item Total -->
+<div style="text-align: center;">
+  <div style="font-weight: bold; color: #2c3e50; font-size: 16px;">
+    <%= number_to_currency(item_total) %>
+  </div>
+  <div style="font-size: 12px; color: #7f8c8d;">
+    (<%= quantity %> × <%= number_to_currency(product.display_price) %>)
+  </div>
+</div>
+
+<!-- Remove Button - Independent of quantity editing -->
+<div style="text-align: center;">
+  <%= link_to cart_remove_path(product_id: product.id), 
+              method: :delete, 
+              confirm: "Remove #{product.name} from cart?",
+              style: "background-color: #e74c3c; color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 14px; display: inline-block;" do %>
+    Remove
+  <% end %>
+</div>
         </div>
       <% end %>
     </div>
@@ -89,6 +131,18 @@
           <%= pluralize(current_cart.total_items, 'item') %>
         </div>
       </div>
+      
+      <!-- Itemized breakdown -->
+      <div style="margin-bottom: 15px;">
+        <% current_cart.products.each do |cart_item| %>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+            <span style="color: #7f8c8d;"><%= cart_item[:product].name %> (× <%= cart_item[:quantity] %>)</span>
+            <span style="color: #2c3e50;"><%= number_to_currency(cart_item[:total_price]) %></span>
+          </div>
+        <% end %>
+      </div>
+      
+      <hr style="border: none; border-top: 1px solid #ddd; margin: 15px 0;">
       
       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; color: #2c3e50;">
         <span>Subtotal:</span>

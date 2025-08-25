@@ -1,4 +1,4 @@
-<!-- app/views/products/index.html.erb - Enhanced search section: -->
+<!-- app/views/products/index.html.erb - Make sure product variable is inside the loop: -->
 
 <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
   
@@ -37,7 +37,7 @@
   <!-- Main Content -->
   <div class="main-content">
     
-    <!-- Enhanced Search Bar - Meeting Section 2.6 Requirements -->
+    <!-- Enhanced Search Bar -->
     <div class="search-bar" style="background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
       <h3 style="margin-top: 0; color: #2c3e50; text-align: center; margin-bottom: 20px;">Search Products</h3>
       
@@ -55,7 +55,7 @@
           <div>
             <%= f.label :search_category_id, "Search Within Category:", style: "display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;" %>
             <%= f.select :search_category_id, 
-                        options_from_collection_for_select(@all_categories, :id, :full_name, params[:search_category_id]), 
+                        options_from_collection_for_select(@categories, :id, :full_name, params[:search_category_id]), 
                         { include_blank: "All Categories" },
                         { style: "padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;" } %>
           </div>
@@ -65,12 +65,6 @@
             <%= f.submit "Search Products", style: "padding: 12px 20px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; white-space: nowrap;" %>
           </div>
         </div>
-
-        <!-- Popular Searches -->
-<%= render 'popular_searches' %>
-
- <!-- Search Results Header -->
-<%= render 'search_results_header' %>
         
         <!-- Clear Search -->
         <% if params[:search].present? || params[:search_category_id].present? %>
@@ -79,17 +73,25 @@
           </div>
         <% end %>
       <% end %>
-      
-      <!-- Search Tips -->
-      <div style="margin-top: 15px; font-size: 14px; color: #7f8c8d; text-align: center;">
-        <strong>Search Tips:</strong> 
-        Try keywords like "tent", "backpack", "waterproof", or "camping"
-        • Use category dropdown to narrow your search
-        • Leave category blank to search all products
-      </div>
     </div>
 
-   
+    <!-- Search Results Header -->
+    <% if params[:search].present? %>
+      <div class="search-results-header" style="background-color: #e8f4fd; border: 1px solid #3498db; border-radius: 6px; padding: 15px; margin-bottom: 20px;">
+        <h4 style="margin: 0 0 10px 0; color: #2c3e50;">
+          Search Results for: "<strong><%= params[:search] %></strong>"
+          <% if params[:search_category_id].present? %>
+            <% search_category = Category.find_by(id: params[:search_category_id]) %>
+            <% if search_category %>
+              in category "<strong><%= search_category.full_name %></strong>"
+            <% end %>
+          <% end %>
+        </h4>
+        <div style="color: #7f8c8d; font-size: 14px;">
+          Found <%= pluralize(@products.total_count, 'product') %> 
+        </div>
+      </div>
+    <% end %>
 
     <!-- Filter Bar -->
     <div class="filter-bar" style="margin-bottom: 20px;">
@@ -105,116 +107,103 @@
                   class: (params[:recently_updated] == 'true' ? "active" : "") %>
     </div>
 
-    <!-- Search Results Info -->
+    <!-- Results Info -->
     <div style="text-align: center; margin-bottom: 20px;">
-      <% if params[:search].present? %>
-        <h3 style="color: #2c3e50;">
-          Search Results for "<%= params[:search] %>"
-          <% if params[:search_category_id].present? %>
-            <% search_category = Category.find_by(id: params[:search_category_id]) %>
-            <%= "in #{search_category.full_name}" if search_category %>
-          <% end %>
-        </h3>
-        <p style="color: #7f8c8d;">Found <%= @products.total_count %> <%= @products.total_count == 1 ? 'product' : 'products' %></p>
-      <% elsif params[:category_id].present? || params[:featured].present? || params[:on_sale].present? || params[:new_products].present? || params[:recently_updated].present? %>
-        <h3>
-          Showing <%= @products.total_count %> 
-          <% if params[:category_id].present? %>
-            <% category = Category.find_by(id: params[:category_id]) %>
-            <%= "in #{category.name}" if category %>
-          <% end %>
-          <%= 'featured products' if params[:featured] == 'true' %>
-          <%= 'products on sale' if params[:on_sale] == 'true' %>
-          <%= 'new products' if params[:new_products] == 'true' %>
-          <%= 'recently updated products' if params[:recently_updated] == 'true' %>
-        </h3>
-      <% else %>
-        <h3>All Products (<%= @products.total_count %>)</h3>
+      <% unless params[:search].present? %>
+        <% if params[:category_id].present? || params[:featured].present? || params[:on_sale].present? || params[:new_products].present? || params[:recently_updated].present? %>
+          <h3>
+            Showing <%= @products.total_count %> 
+            <% if params[:category_id].present? %>
+              <% category = Category.find_by(id: params[:category_id]) %>
+              <%= "in #{category.name}" if category %>
+            <% end %>
+            <%= 'featured products' if params[:featured] == 'true' %>
+            <%= 'products on sale' if params[:on_sale] == 'true' %>
+            <%= 'new products' if params[:new_products] == 'true' %>
+            <%= 'recently updated products' if params[:recently_updated] == 'true' %>
+          </h3>
+        <% else %>
+          <h3>All Products (<%= @products.total_count %>)</h3>
+        <% end %>
       <% end %>
     </div>
-
-    <!-- Pagination Info -->
-    <%= render 'shared/pagination_info', collection: @products %>
 
     <!-- Products Grid -->
     <div class="products-grid">
       <% @products.each do |product| %>
         <div class="product-card">
-  <%= link_to product_path(product), style: "text-decoration: none; color: inherit;" do %>
-    <% if product.primary_image.present? %>
-      <%= image_tag product.primary_image, alt: product.name, class: "product-image" %>
-    <% else %>
-      <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #7f8c8d;">
-        No Image
-      </div>
-    <% end %>
-    
-    <div class="product-info">
-      <div class="product-categories">
-        <%= product.category_names %>
-      </div>
-      
-      <div class="product-name">
-        <%= product.name %>
-        
-        <!-- Product Badges -->
-        <div style="margin-top: 5px;">
-          <% if product.featured? %>
-            <span style="background-color: #f39c12; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">FEATURED</span>
+          <%= link_to product_path(product), style: "text-decoration: none; color: inherit;" do %>
+            <% if product.primary_image.present? %>
+              <%= image_tag product.primary_image, alt: product.name, class: "product-image" %>
+            <% else %>
+              <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #7f8c8d;">
+                No Image
+              </div>
+            <% end %>
+            
+            <div class="product-info">
+              <div class="product-categories">
+                <%= product.category_names %>
+              </div>
+              
+              <div class="product-name">
+                <%= product.name %>
+                
+                <!-- Product Badges -->
+                <div style="margin-top: 5px;">
+                  <% if product.featured? %>
+                    <span style="background-color: #f39c12; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">FEATURED</span>
+                  <% end %>
+                  <% if product.on_sale? %>
+                    <span style="background-color: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">SALE</span>
+                  <% end %>
+                  <% if product.is_new? %>
+                    <span style="background-color: #27ae60; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">NEW</span>
+                  <% end %>
+                  <% if product.recently_updated? %>
+                    <span style="background-color: #9b59b6; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">UPDATED</span>
+                  <% end %>
+                </div>
+              </div>
+              
+              <!-- Highlight search terms -->
+              <% if params[:search].present? %>
+                <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px; font-style: italic;">
+                  <% description_excerpt = truncate(product.description, length: 100) %>
+                  <%= highlight(description_excerpt, params[:search], highlighter: '<mark style="background-color: #f1c40f; padding: 1px 3px;">\1</mark>') %>
+                </div>
+              <% end %>
+              
+              <div class="product-price <%= 'on-sale' if product.on_sale? %>">
+                <% if product.on_sale? %>
+                  <%= number_to_currency(product.sale_price) %>
+                  <span class="original-price"><%= number_to_currency(product.price) %></span>
+                <% else %>
+                  <%= number_to_currency(product.price) %>
+                <% end %>
+              </div>
+              
+              <div class="product-stock <%= product.in_stock? ? 'in-stock' : 'out-of-stock' %>">
+                <%= product.in_stock? ? "In Stock (#{product.stock_quantity})" : "Out of Stock" %>
+              </div>
+            </div>
           <% end %>
-          <% if product.on_sale? %>
-            <span style="background-color: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">SALE</span>
-          <% end %>
-          <% if product.is_new? %>
-            <span style="background-color: #27ae60; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">NEW</span>
-          <% end %>
-          <% if product.recently_updated? %>
-            <span style="background-color: #9b59b6; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">UPDATED</span>
-          <% end %>
+          
+          <!-- Quick Add to Cart Button - This should be INSIDE the @products.each loop -->
+          <div style="padding: 0 15px 15px 15px;">
+            <% if product.in_stock? %>
+              <%= form_with url: cart_add_path(product_id: product.id), method: :post, local: true do |f| %>
+                <%= f.hidden_field :quantity, value: 1 %>
+                <%= f.submit "Quick Add to Cart", 
+                            style: "width: 100%; padding: 8px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;" %>
+              <% end %>
+            <% else %>
+              <button style="width: 100%; padding: 8px; background-color: #95a5a6; color: white; border: none; border-radius: 4px; font-size: 14px;" disabled>
+                Out of Stock
+              </button>
+            <% end %>
+          </div>
         </div>
-      </div>
-      
-      <!-- Highlight search terms in product name and description -->
-      <% if params[:search].present? %>
-        <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px; font-style: italic;">
-          <% description_excerpt = truncate(product.description, length: 100) %>
-          <%= highlight(description_excerpt, params[:search], highlighter: '<mark style="background-color: #f1c40f; padding: 1px 3px;">\1</mark>') %>
-        </div>
-      <% end %>
-      
-      <div class="product-price <%= 'on-sale' if product.on_sale? %>">
-        <% if product.on_sale? %>
-          <%= number_to_currency(product.sale_price) %>
-          <span class="original-price"><%= number_to_currency(product.price) %></span>
-        <% else %>
-          <%= number_to_currency(product.price) %>
-        <% end %>
-      </div>
-      
-      <div class="product-stock <%= product.in_stock? ? 'in-stock' : 'out-of-stock' %>">
-        <%= product.in_stock? ? "In Stock (#{product.stock_quantity})" : "Out of Stock" %>
-      </div>
-    </div>
-  <% end %>
-  
-  <!-- Quick Add to Cart Button -->
-  <div style="padding: 0 15px 15px 15px;">
-  <% if product.in_stock? %>
-    <%= form_with url: add_to_cart_path, method: :post, local: true do |f| %>
-      <%= f.hidden_field :product_id, value: product.id %>
-      <%= f.hidden_field :quantity, value: 1 %>
-      <%= f.submit "Quick Add to Cart", 
-                  style: "width: 100%; padding: 8px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;",
-                  onmouseover: "this.style.backgroundColor='#2980b9';",
-                  onmouseout: "this.style.backgroundColor='#3498db';" %>
-    <% end %>
-  <% else %>
-    <button style="width: 100%; padding: 8px; background-color: #95a5a6; color: white; border: none; border-radius: 4px; font-size: 14px;" disabled>
-      Out of Stock
-    </button>
-  <% end %>
-</div>
-</div>
       <% end %>
     </div>
 
@@ -226,7 +215,7 @@
       <div style="text-align: center; margin: 50px 0;">
         <h3>No products found</h3>
         <% if params[:search].present? %>
-          <p>No products found for "<%= params[:search] %>"<%= " in #{@search_category.full_name}" if @search_category %></p>
+          <p>No products found for "<%= params[:search] %>"</p>
           <p>Try a different search term or category, or <%= link_to "browse all products", products_path, style: "color: #3498db;" %></p>
         <% else %>
           <p>Try adjusting your search or filter criteria.</p>

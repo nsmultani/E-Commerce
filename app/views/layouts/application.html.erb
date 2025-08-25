@@ -276,6 +276,40 @@
         padding: 20px 0;
         margin-top: 50px;
       }
+
+      .cart-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .cart-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 300px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+  }
+  
+  .cart-dropdown:hover .cart-dropdown-content {
+    display: block;
+  }
+  
+  .cart-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #ecf0f1;
+  }
+  
+  .cart-dropdown-item:last-child {
+    border-bottom: none;
+  }
     </style>
   </head>
 
@@ -288,14 +322,67 @@
   <%= link_to "Browse Categories", categories_path, class: ("active" if current_page?(categories_path)) %>
   <%= link_to "About", about_path, class: ("active" if current_page?(about_path)) %>
   <%= link_to "Contact", contact_path, class: ("active" if current_page?(contact_path)) %>
-  <%= link_to shopping_cart_path, style: "color: white; text-decoration: none; position: relative;" do %>
-    🛒 Cart
-    <% if cart_item_count > 0 %>
-      <span style="background-color: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; position: absolute; top: -5px; right: -10px;">
-        <%= cart_item_count %>
-      </span>
+  <div class="cart-dropdown">
+    <%= link_to cart_path, style: "color: white; text-decoration: none; position: relative;" do %>
+      🛒 Cart
+      <% if cart_item_count > 0 %>
+        <span style="background-color: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; position: absolute; top: -5px; right: -10px;">
+          <%= cart_item_count %>
+        </span>
+      <% end %>
     <% end %>
-  <% end %>
+    
+    <!-- Cart Dropdown Preview -->
+    <% if cart_item_count > 0 %>
+      <div class="cart-dropdown-content">
+        <h4 style="margin: 0 0 10px 0; color: #2c3e50; border-bottom: 1px solid #ddd; padding-bottom: 8px;">
+          Cart Preview (<%= cart_item_count %> items)
+        </h4>
+        
+        <% current_cart.products.first(3).each do |cart_item| %>
+          <div class="cart-dropdown-item">
+            <% if cart_item[:product].primary_image.present? %>
+              <%= image_tag cart_item[:product].primary_image, 
+                          style: "width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" %>
+            <% else %>
+              <div style="width: 40px; height: 40px; background-color: #f0f0f0; border-radius: 4px;"></div>
+            <% end %>
+            
+            <div style="flex: 1;">
+              <div style="font-size: 14px; color: #2c3e50; font-weight: bold;">
+                <%= truncate(cart_item[:product].name, length: 25) %>
+              </div>
+              <div style="font-size: 12px; color: #7f8c8d;">
+                <%= cart_item[:quantity] %> × <%= number_to_currency(cart_item[:product].display_price) %>
+              </div>
+            </div>
+            
+            <div style="font-weight: bold; color: #2c3e50;">
+              <%= number_to_currency(cart_item[:total_price]) %>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if current_cart.products.count > 3 %>
+          <div style="text-align: center; color: #7f8c8d; font-size: 12px; margin: 10px 0;">
+            ... and <%= current_cart.products.count - 3 %> more items
+          </div>
+        <% end %>
+        
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 10px 0;">
+        
+        <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px;">
+          <span>Subtotal:</span>
+          <span><%= number_to_currency(cart_subtotal) %></span>
+        </div>
+        
+        <div style="text-align: center;">
+          <%= link_to "View Full Cart", cart_path, 
+                      style: "background-color: #3498db; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px;" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
   <%= link_to "Admin", admin_root_path %>
 </nav>
       </div>
@@ -310,5 +397,6 @@
         <p>&copy; 2025 Northern Lights Outdoor Gear. All rights reserved.</p>
       </div>
     </div>
+
   </body>
 </html>
