@@ -106,20 +106,34 @@
       
       <!-- Add to Cart Button (placeholder) -->
       <div class="add-to-cart" style="margin-bottom: 20px;">
-        <% if @product.in_stock? %>
-          <button style="background-color: #3498db; color: white; padding: 15px 30px; border: none; border-radius: 6px; font-size: 18px; cursor: pointer; width: 100%; margin-bottom: 10px;" onclick="alert('Shopping cart functionality coming in Section 3!')">
-            Add to Cart - <%= number_to_currency(@product.display_price) %>
-          </button>
-        <% else %>
-          <button style="background-color: #95a5a6; color: white; padding: 15px 30px; border: none; border-radius: 6px; font-size: 18px; width: 100%; margin-bottom: 10px;" disabled>
-            Out of Stock
-          </button>
-        <% end %>
-        
-        <div style="text-align: center;">
-          <%= link_to "← Back to Products", products_path, style: "color: #3498db; text-decoration: none;" %>
-        </div>
+  <% if @product.in_stock? %>
+    <%= form_with url: add_to_cart_path, method: :post, local: true do |f| %>
+      <%= f.hidden_field :product_id, value: @product.id %>
+      
+      <div style="margin-bottom: 15px;">
+        <%= f.label :quantity, "Quantity:", style: "display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;" %>
+        <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity,
+                          style: "width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" %>
+        <span style="color: #7f8c8d; margin-left: 10px; font-size: 14px;">
+          (Max: <%= @product.stock_quantity %>)
+        </span>
       </div>
+      
+      <%= f.submit "Add to Cart - #{number_to_currency(@product.display_price)}", 
+                  style: "background-color: #3498db; color: white; padding: 15px 30px; border: none; border-radius: 6px; font-size: 18px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: background-color 0.3s;",
+                  onmouseover: "this.style.backgroundColor='#2980b9';",
+                  onmouseout: "this.style.backgroundColor='#3498db';" %>
+    <% end %>
+  <% else %>
+    <button style="background-color: #95a5a6; color: white; padding: 15px 30px; border: none; border-radius: 6px; font-size: 18px; width: 100%; margin-bottom: 10px;" disabled>
+      Out of Stock
+    </button>
+  <% end %>
+  
+  <div style="text-align: center;">
+    <%= link_to "← Back to Products", products_path, style: "color: #3498db; text-decoration: none;" %>
+  </div>
+</div>
       
       <!-- Featured Badge -->
       <% if @product.featured? %>

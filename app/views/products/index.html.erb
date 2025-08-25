@@ -140,63 +140,81 @@
     <div class="products-grid">
       <% @products.each do |product| %>
         <div class="product-card">
-          <%= link_to product_path(product), style: "text-decoration: none; color: inherit;" do %>
-            <% if product.primary_image.present? %>
-              <%= image_tag product.primary_image, alt: product.name, class: "product-image" %>
-            <% else %>
-              <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #7f8c8d;">
-                No Image
-              </div>
-            <% end %>
-            
-            <div class="product-info">
-              <div class="product-categories">
-                <%= product.category_names %>
-              </div>
-              
-              <div class="product-name">
-                <%= product.name %>
-                
-                <!-- Product Badges -->
-                <div style="margin-top: 5px;">
-                  <% if product.featured? %>
-                    <span style="background-color: #f39c12; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">FEATURED</span>
-                  <% end %>
-                  <% if product.on_sale? %>
-                    <span style="background-color: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">SALE</span>
-                  <% end %>
-                  <% if product.is_new? %>
-                    <span style="background-color: #27ae60; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">NEW</span>
-                  <% end %>
-                  <% if product.recently_updated? %>
-                    <span style="background-color: #9b59b6; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">UPDATED</span>
-                  <% end %>
-                </div>
-              </div>
-              
-              <!-- Highlight search terms in product name and description -->
-              <% if params[:search].present? %>
-                <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px; font-style: italic;">
-                  <% description_excerpt = truncate(product.description, length: 100) %>
-                  <%= highlight(description_excerpt, params[:search], highlighter: '<mark style="background-color: #f1c40f; padding: 1px 3px;">\1</mark>') %>
-                </div>
-              <% end %>
-              
-              <div class="product-price <%= 'on-sale' if product.on_sale? %>">
-                <% if product.on_sale? %>
-                  <%= number_to_currency(product.sale_price) %>
-                  <span class="original-price"><%= number_to_currency(product.price) %></span>
-                <% else %>
-                  <%= number_to_currency(product.price) %>
-                <% end %>
-              </div>
-              
-              <div class="product-stock <%= product.in_stock? ? 'in-stock' : 'out-of-stock' %>">
-                <%= product.in_stock? ? "In Stock (#{product.stock_quantity})" : "Out of Stock" %>
-              </div>
-            </div>
+  <%= link_to product_path(product), style: "text-decoration: none; color: inherit;" do %>
+    <% if product.primary_image.present? %>
+      <%= image_tag product.primary_image, alt: product.name, class: "product-image" %>
+    <% else %>
+      <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #7f8c8d;">
+        No Image
+      </div>
+    <% end %>
+    
+    <div class="product-info">
+      <div class="product-categories">
+        <%= product.category_names %>
+      </div>
+      
+      <div class="product-name">
+        <%= product.name %>
+        
+        <!-- Product Badges -->
+        <div style="margin-top: 5px;">
+          <% if product.featured? %>
+            <span style="background-color: #f39c12; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">FEATURED</span>
+          <% end %>
+          <% if product.on_sale? %>
+            <span style="background-color: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">SALE</span>
+          <% end %>
+          <% if product.is_new? %>
+            <span style="background-color: #27ae60; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">NEW</span>
+          <% end %>
+          <% if product.recently_updated? %>
+            <span style="background-color: #9b59b6; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">UPDATED</span>
           <% end %>
         </div>
+      </div>
+      
+      <!-- Highlight search terms in product name and description -->
+      <% if params[:search].present? %>
+        <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px; font-style: italic;">
+          <% description_excerpt = truncate(product.description, length: 100) %>
+          <%= highlight(description_excerpt, params[:search], highlighter: '<mark style="background-color: #f1c40f; padding: 1px 3px;">\1</mark>') %>
+        </div>
+      <% end %>
+      
+      <div class="product-price <%= 'on-sale' if product.on_sale? %>">
+        <% if product.on_sale? %>
+          <%= number_to_currency(product.sale_price) %>
+          <span class="original-price"><%= number_to_currency(product.price) %></span>
+        <% else %>
+          <%= number_to_currency(product.price) %>
+        <% end %>
+      </div>
+      
+      <div class="product-stock <%= product.in_stock? ? 'in-stock' : 'out-of-stock' %>">
+        <%= product.in_stock? ? "In Stock (#{product.stock_quantity})" : "Out of Stock" %>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Quick Add to Cart Button -->
+  <div style="padding: 0 15px 15px 15px;">
+  <% if product.in_stock? %>
+    <%= form_with url: add_to_cart_path, method: :post, local: true do |f| %>
+      <%= f.hidden_field :product_id, value: product.id %>
+      <%= f.hidden_field :quantity, value: 1 %>
+      <%= f.submit "Quick Add to Cart", 
+                  style: "width: 100%; padding: 8px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background-color 0.3s;",
+                  onmouseover: "this.style.backgroundColor='#2980b9';",
+                  onmouseout: "this.style.backgroundColor='#3498db';" %>
+    <% end %>
+  <% else %>
+    <button style="width: 100%; padding: 8px; background-color: #95a5a6; color: white; border: none; border-radius: 4px; font-size: 14px;" disabled>
+      Out of Stock
+    </button>
+  <% end %>
+</div>
+</div>
       <% end %>
     </div>
 
