@@ -1,9 +1,12 @@
-ActiveAdmin.register Product do
-  # Permitted parameters - Add images
-  permit_params :name, :description, :sku, :price, :stock_quantity, :weight, 
-                :dimensions, :is_active, :featured, :on_sale, :sale_price, images: []
+# app/admin/products.rb - Make sure this is updated with category support:
 
-  # Index page configuration - Add image column
+ActiveAdmin.register Product do
+  # Permitted parameters - Include category_ids
+  permit_params :name, :description, :sku, :price, :stock_quantity, :weight, 
+                :dimensions, :is_active, :featured, :on_sale, :sale_price, 
+                images: [], category_ids: []
+
+  # Index page configuration - Add categories column
   index do
     selectable_column
     id_column
@@ -16,6 +19,9 @@ ActiveAdmin.register Product do
     end
     column :name
     column :sku
+    column "Categories" do |product|
+      product.category_names
+    end
     column :price do |product|
       number_to_currency(product.price)
     end
@@ -27,9 +33,10 @@ ActiveAdmin.register Product do
     actions
   end
 
-  # Filters for the sidebar
+  # Filters for the sidebar - Add category filter
   filter :name
   filter :sku
+  filter :categories, as: :select, collection: -> { Category.ordered }
   filter :price
   filter :stock_quantity
   filter :is_active
@@ -37,7 +44,7 @@ ActiveAdmin.register Product do
   filter :on_sale
   filter :created_at
 
-  # Form configuration - Add image upload
+  # Form configuration - Add categories section
   form do |f|
     f.inputs "Product Images" do
       f.input :images, as: :file, input_html: { multiple: true, accept: 'image/*' }, 
@@ -58,6 +65,12 @@ ActiveAdmin.register Product do
       f.input :name
       f.input :description, as: :text, rows: 4
       f.input :sku, hint: "Unique product identifier (letters, numbers, hyphens, underscores)"
+    end
+
+    f.inputs "Categories" do
+      f.input :category_ids, as: :check_boxes, 
+              collection: Category.ordered.map { |c| [c.full_name, c.id] },
+              hint: "Select one or more categories for this product"
     end
     
     f.inputs "Pricing" do
@@ -80,7 +93,7 @@ ActiveAdmin.register Product do
     f.actions
   end
 
-  # Show page configuration - Add image display
+  # Show page configuration - Add categories display
   show do
     attributes_table do
       row :images do |product|
@@ -97,6 +110,17 @@ ActiveAdmin.register Product do
       row :name
       row :description
       row :sku
+      row :categories do |product|
+        if product.categories.any?
+          ul do
+            product.categories.each do |category|
+              li link_to(category.full_name, admin_category_path(category))
+            end
+          end
+        else
+          "No categories assigned"
+        end
+      end
       row :price do |product|
         number_to_currency(product.price)
       end
