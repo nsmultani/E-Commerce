@@ -1,0 +1,108 @@
+
+<!-- Search Bar -->
+<div class="search-bar">
+  <%= form_with url: products_path, method: :get, local: true do |f| %>
+    <%= f.text_field :search, placeholder: "Search products...", value: params[:search] %>
+    <%= f.select :category_id, options_from_collection_for_select(@categories, :id, :name, params[:category_id]), 
+                 { include_blank: "All Categories" } %>
+    <%= f.submit "Search", class: "search-button" %>
+  <% end %>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+  <%= link_to "All Products", products_path, 
+              class: (params[:featured].blank? && params[:on_sale].blank? && params[:category_id].blank? ? "active" : "") %>
+  <%= link_to "Featured Products", products_path(featured: true), 
+              class: (params[:featured] == 'true' ? "active" : "") %>
+  <%= link_to "On Sale", products_path(on_sale: true), 
+              class: (params[:on_sale] == 'true' ? "active" : "") %>
+</div>
+
+<!-- Results Info -->
+<div style="text-align: center; margin-bottom: 20px;">
+  <% if params[:search].present? || params[:category_id].present? || params[:featured].present? || params[:on_sale].present? %>
+    <h3>
+      Showing <%= @total_count %> 
+      <%= 'search results' if params[:search].present? %>
+      <% if params[:category_id].present? %>
+        <% category = Category.find_by(id: params[:category_id]) %>
+        <%= "in #{category.name}" if category %>
+      <% end %>
+      <%= 'featured products' if params[:featured] == 'true' %>
+      <%= 'products on sale' if params[:on_sale] == 'true' %>
+    </h3>
+  <% else %>
+    <h3>All Products (<%= @total_count %>)</h3>
+  <% end %>
+</div>
+
+<!-- Products Grid -->
+<div class="products-grid">
+  <% @products.each do |product| %>
+    <div class="product-card">
+      <%= link_to product_path(product), style: "text-decoration: none; color: inherit;" do %>
+        <% if product.primary_image.present? %>
+          <%= image_tag product.primary_image, alt: product.name, class: "product-image" %>
+        <% else %>
+          <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #7f8c8d;">
+            No Image
+          </div>
+        <% end %>
+        
+        <div class="product-info">
+          <div class="product-categories">
+            <%= product.category_names %>
+          </div>
+          
+          <div class="product-name">
+            <%= product.name %>
+          </div>
+          
+          <div class="product-price <%= 'on-sale' if product.on_sale? %>">
+            <% if product.on_sale? %>
+              <%= number_to_currency(product.sale_price) %>
+              <span class="original-price"><%= number_to_currency(product.price) %></span>
+            <% else %>
+              <%= number_to_currency(product.price) %>
+            <% end %>
+          </div>
+          
+          <div class="product-stock <%= product.in_stock? ? 'in-stock' : 'out-of-stock' %>">
+            <%= product.in_stock? ? "In Stock (#{product.stock_quantity})" : "Out of Stock" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Simple Pagination -->
+<% if @total_pages > 1 %>
+  <div class="pagination">
+    <% if @current_page > 1 %>
+      <%= link_to "Previous", products_path(params.permit!.merge(page: @current_page - 1)) %>
+    <% end %>
+    
+    <% (1..@total_pages).each do |page| %>
+      <% if page == @current_page %>
+        <span class="current"><%= page %></span>
+      <% else %>
+        <%= link_to page, products_path(params.permit!.merge(page: page)) %>
+      <% end %>
+    <% end %>
+    
+    <% if @current_page < @total_pages %>
+      <%= link_to "Next", products_path(params.permit!.merge(page: @current_page + 1)) %>
+    <% end %>
+  </div>
+<% end %>
+
+<!-- No products message -->
+<% if @products.empty? %>
+  <div style="text-align: center; margin: 50px 0;">
+    <h3>No products found</h3>
+    <p>Try adjusting your search or filter criteria.</p>
+    <%= link_to "Browse All Products", products_path, style: "color: #3498db;" %>
+  </div>
+<% end %>
