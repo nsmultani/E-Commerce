@@ -1,5 +1,3 @@
-# app/controllers/category_products_controller.rb
-
 class CategoryProductsController < ApplicationController
   before_action :set_category
 

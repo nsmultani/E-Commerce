@@ -1,5 +1,3 @@
-# app/controllers/categories_controller.rb - Use Kaminari:
-
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:show]
 
