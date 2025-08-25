@@ -1,4 +1,4 @@
-# app/controllers/products_controller.rb - Update the show method:
+# app/controllers/products_controller.rb - Add new filters:
 
 class ProductsController < ApplicationController
   before_action :set_product, only: [:show]
@@ -12,9 +12,11 @@ class ProductsController < ApplicationController
       @products = @products.where("LOWER(products.name) LIKE ? OR LOWER(products.description) LIKE ?", search_term, search_term)
     end
     
-    # Apply basic filters (no joins needed)
+    # Apply filters (no joins needed for these)
     @products = @products.featured if params[:featured] == 'true'
     @products = @products.on_sale if params[:on_sale] == 'true'
+    @products = @products.new_products if params[:new_products] == 'true'
+    @products = @products.recently_updated if params[:recently_updated] == 'true'
     
     # Apply category filter (requires join)
     if params[:category_id].present?

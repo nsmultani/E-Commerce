@@ -1,3 +1,5 @@
+# app/models/product.rb - Add new scopes:
+
 class Product < ApplicationRecord
   # Active Storage associations for images
   has_many_attached :images
@@ -21,6 +23,10 @@ class Product < ApplicationRecord
   scope :on_sale, -> { where(on_sale: true) }
   scope :in_category, ->(category) { joins(:categories).where(categories: { id: category.id }) }
   
+  # New scopes for filtering
+  scope :new_products, -> { where('created_at >= ?', 30.days.ago) }
+  scope :recently_updated, -> { where('updated_at >= ? AND created_at < ?', 7.days.ago, 30.days.ago) }
+  
   def display_price
     on_sale? && sale_price.present? ? sale_price : price
   end
@@ -35,6 +41,14 @@ class Product < ApplicationRecord
 
   def category_names
     categories.pluck(:name).join(', ')
+  end
+
+  def is_new?
+    created_at >= 30.days.ago
+  end
+
+  def recently_updated?
+    updated_at >= 7.days.ago && created_at < 30.days.ago
   end
 
   # Define which attributes can be searched/filtered in ActiveAdmin

@@ -180,3 +180,16 @@ Canada</p>
 end
 
 puts "Created static pages: About and Contact"
+
+if Product.count > 0
+  # Make first 2 products "new"
+  Product.limit(2).update_all(created_at: 10.days.ago)
+  
+  # Make next 2 products "recently updated"
+  products_to_update = Product.offset(2).limit(2)
+  products_to_update.each do |product|
+    product.update(created_at: 60.days.ago, updated_at: 3.days.ago)
+  end
+  
+  puts "Updated products for filtering demonstration"
+end

@@ -53,13 +53,17 @@
   
   <!-- Filter options -->
   <div class="filter-bar" style="text-align: center;">
-    <%= link_to "All Products", category_path(@category.slug), 
-                class: "filter-link", style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:featured].blank? && params[:on_sale].blank? ? '#3498db' : '#ecf0f1'}; color: #{params[:featured].blank? && params[:on_sale].blank? ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
-    <%= link_to "Featured Only", category_path(@category.slug, featured: true), 
-                style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:featured] == 'true' ? '#3498db' : '#ecf0f1'}; color: #{params[:featured] == 'true' ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
-    <%= link_to "On Sale", category_path(@category.slug, on_sale: true), 
-                style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:on_sale] == 'true' ? '#27ae60' : '#ecf0f1'}; color: #{params[:on_sale] == 'true' ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
-  </div>
+  <%= link_to "All Products", category_path(@category.slug), 
+              class: "filter-link", style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:featured].blank? && params[:on_sale].blank? && params[:new_products].blank? && params[:recently_updated].blank? ? '#3498db' : '#ecf0f1'}; color: #{params[:featured].blank? && params[:on_sale].blank? && params[:new_products].blank? && params[:recently_updated].blank? ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
+  <%= link_to "Featured Only", category_path(@category.slug, featured: true), 
+              style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:featured] == 'true' ? '#f39c12' : '#ecf0f1'}; color: #{params[:featured] == 'true' ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
+  <%= link_to "On Sale", category_path(@category.slug, on_sale: true), 
+              style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:on_sale] == 'true' ? '#e74c3c' : '#ecf0f1'}; color: #{params[:on_sale] == 'true' ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
+  <%= link_to "New Products", category_path(@category.slug, new_products: true), 
+              style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:new_products] == 'true' ? '#27ae60' : '#ecf0f1'}; color: #{params[:new_products] == 'true' ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
+  <%= link_to "Recently Updated", category_path(@category.slug, recently_updated: true), 
+              style: "display: inline-block; margin: 5px; padding: 6px 12px; background-color: #{params[:recently_updated] == 'true' ? '#9b59b6' : '#ecf0f1'}; color: #{params[:recently_updated] == 'true' ? 'white' : '#2c3e50'}; text-decoration: none; border-radius: 15px; font-size: 14px;" %>
+</div>
 </div>
 
 <!-- Products Grid -->

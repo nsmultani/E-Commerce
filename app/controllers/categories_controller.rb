@@ -1,4 +1,4 @@
-# app/controllers/categories_controller.rb
+# app/controllers/categories_controller.rb - Add new filters:
 
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:show]
@@ -14,6 +14,8 @@ class CategoriesController < ApplicationController
     # Apply filters if present
     @products = @products.featured if params[:featured] == 'true'
     @products = @products.on_sale if params[:on_sale] == 'true'
+    @products = @products.new_products if params[:new_products] == 'true'
+    @products = @products.recently_updated if params[:recently_updated] == 'true'
     
     # Apply search within category
     if params[:search].present?

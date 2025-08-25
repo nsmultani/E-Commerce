@@ -1,4 +1,4 @@
-<!-- app/views/products/index.html.erb - Add category sidebar: -->
+<!-- app/views/products/index.html.erb - Update the filter bar: -->
 
 <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
   
@@ -21,6 +21,17 @@
         <% end %>
       </div>
     <% end %>
+    
+    <!-- Filter Counts -->
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1;">
+      <h4 style="color: #2c3e50; margin-bottom: 10px;">Filter Options</h4>
+      <div style="font-size: 14px; color: #7f8c8d; line-height: 1.6;">
+        <div>Featured: <%= Product.active.featured.count %></div>
+        <div>On Sale: <%= Product.active.on_sale.count %></div>
+        <div>New Products: <%= Product.active.new_products.count %></div>
+        <div>Recently Updated: <%= Product.active.recently_updated.count %></div>
+      </div>
+    </div>
   </div>
   
   <!-- Main Content -->
@@ -36,19 +47,23 @@
       <% end %>
     </div>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
+    <!-- Enhanced Filter Bar -->
+    <div class="filter-bar" style="margin-bottom: 20px;">
       <%= link_to "All Products", products_path, 
-                  class: (params[:featured].blank? && params[:on_sale].blank? && params[:category_id].blank? ? "active" : "") %>
-      <%= link_to "Featured Products", products_path(featured: true), 
+                  class: (params[:featured].blank? && params[:on_sale].blank? && params[:new_products].blank? && params[:recently_updated].blank? && params[:category_id].blank? ? "active" : "") %>
+      <%= link_to "Featured", products_path(featured: true), 
                   class: (params[:featured] == 'true' ? "active" : "") %>
       <%= link_to "On Sale", products_path(on_sale: true), 
                   class: (params[:on_sale] == 'true' ? "active" : "") %>
+      <%= link_to "New Products", products_path(new_products: true), 
+                  class: (params[:new_products] == 'true' ? "active" : "") %>
+      <%= link_to "Recently Updated", products_path(recently_updated: true), 
+                  class: (params[:recently_updated] == 'true' ? "active" : "") %>
     </div>
 
     <!-- Results Info -->
     <div style="text-align: center; margin-bottom: 20px;">
-      <% if params[:search].present? || params[:category_id].present? || params[:featured].present? || params[:on_sale].present? %>
+      <% if params[:search].present? || params[:category_id].present? || params[:featured].present? || params[:on_sale].present? || params[:new_products].present? || params[:recently_updated].present? %>
         <h3>
           Showing <%= @total_count %> 
           <%= 'search results' if params[:search].present? %>
@@ -58,6 +73,8 @@
           <% end %>
           <%= 'featured products' if params[:featured] == 'true' %>
           <%= 'products on sale' if params[:on_sale] == 'true' %>
+          <%= 'new products' if params[:new_products] == 'true' %>
+          <%= 'recently updated products' if params[:recently_updated] == 'true' %>
         </h3>
       <% else %>
         <h3>All Products (<%= @total_count %>)</h3>
@@ -84,6 +101,22 @@
               
               <div class="product-name">
                 <%= product.name %>
+                
+                <!-- Product Badges -->
+                <div style="margin-top: 5px;">
+                  <% if product.featured? %>
+                    <span style="background-color: #f39c12; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">FEATURED</span>
+                  <% end %>
+                  <% if product.on_sale? %>
+                    <span style="background-color: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">SALE</span>
+                  <% end %>
+                  <% if product.is_new? %>
+                    <span style="background-color: #27ae60; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">NEW</span>
+                  <% end %>
+                  <% if product.recently_updated? %>
+                    <span style="background-color: #9b59b6; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; margin-right: 3px;">UPDATED</span>
+                  <% end %>
+                </div>
               </div>
               
               <div class="product-price <%= 'on-sale' if product.on_sale? %>">
