@@ -1,12 +1,19 @@
 ActiveAdmin.register Product do
-  # Permitted parameters
+  # Permitted parameters - Add images
   permit_params :name, :description, :sku, :price, :stock_quantity, :weight, 
-                :dimensions, :is_active, :featured, :on_sale, :sale_price
+                :dimensions, :is_active, :featured, :on_sale, :sale_price, images: []
 
-  # Index page configuration
+  # Index page configuration - Add image column
   index do
     selectable_column
     id_column
+    column :image do |product|
+      if product.primary_image.present?
+        image_tag url_for(product.primary_image), size: "50x50", style: "object-fit: cover;"
+      else
+        "No Image"
+      end
+    end
     column :name
     column :sku
     column :price do |product|
@@ -30,8 +37,23 @@ ActiveAdmin.register Product do
   filter :on_sale
   filter :created_at
 
-  # Form configuration - Updated with explicit min values
+  # Form configuration - Add image upload
   form do |f|
+    f.inputs "Product Images" do
+      f.input :images, as: :file, input_html: { multiple: true, accept: 'image/*' }, 
+              hint: "Upload one or more product images (JPEG, PNG, GIF, WebP - max 5MB each)"
+      
+      if f.object.images.attached?
+        f.inputs "Current Images" do
+          f.object.images.each_with_index do |image, index|
+            li do
+              image_tag url_for(image), size: "150x150", style: "object-fit: cover; margin: 5px;"
+            end
+          end
+        end
+      end
+    end
+    
     f.inputs "Product Details" do
       f.input :name
       f.input :description, as: :text, rows: 4
@@ -58,9 +80,20 @@ ActiveAdmin.register Product do
     f.actions
   end
 
-  # Show page configuration
+  # Show page configuration - Add image display
   show do
     attributes_table do
+      row :images do |product|
+        if product.images.attached?
+          div do
+            product.images.each do |image|
+              image_tag url_for(image), size: "200x200", style: "object-fit: cover; margin: 5px; border: 1px solid #ddd;"
+            end
+          end
+        else
+          "No images uploaded"
+        end
+      end
       row :name
       row :description
       row :sku
