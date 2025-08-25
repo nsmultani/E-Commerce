@@ -25,7 +25,7 @@ class Category < ApplicationRecord
 
   # Define which associations can be searched - simplified for Ransack
   def self.ransackable_associations(auth_object = nil)
-    ["products", "product_categories"]
+    ["products", "product_categories", "subcategories", "parent_category"]
   end
 
   def full_name

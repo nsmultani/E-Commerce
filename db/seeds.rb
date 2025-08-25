@@ -288,3 +288,30 @@ new_product_assignments.each do |sku, category_names|
 end
 
 puts "Assigned categories to new products"
+
+provinces_data = [
+  { name: "Alberta", abbreviation: "AB", gst_rate: 0.05, pst_rate: 0.00, hst_rate: 0.00 },
+  { name: "British Columbia", abbreviation: "BC", gst_rate: 0.05, pst_rate: 0.07, hst_rate: 0.00 },
+  { name: "Manitoba", abbreviation: "MB", gst_rate: 0.05, pst_rate: 0.07, hst_rate: 0.00 },
+  { name: "New Brunswick", abbreviation: "NB", gst_rate: 0.00, pst_rate: 0.00, hst_rate: 0.15 },
+  { name: "Newfoundland and Labrador", abbreviation: "NL", gst_rate: 0.00, pst_rate: 0.00, hst_rate: 0.15 },
+  { name: "Northwest Territories", abbreviation: "NT", gst_rate: 0.05, pst_rate: 0.00, hst_rate: 0.00 },
+  { name: "Nova Scotia", abbreviation: "NS", gst_rate: 0.00, pst_rate: 0.00, hst_rate: 0.15 },
+  { name: "Nunavut", abbreviation: "NU", gst_rate: 0.05, pst_rate: 0.00, hst_rate: 0.00 },
+  { name: "Ontario", abbreviation: "ON", gst_rate: 0.00, pst_rate: 0.00, hst_rate: 0.13 },
+  { name: "Prince Edward Island", abbreviation: "PE", gst_rate: 0.00, pst_rate: 0.00, hst_rate: 0.15 },
+  { name: "Quebec", abbreviation: "QC", gst_rate: 0.05, pst_rate: 0.09975, hst_rate: 0.00 },
+  { name: "Saskatchewan", abbreviation: "SK", gst_rate: 0.05, pst_rate: 0.06, hst_rate: 0.00 },
+  { name: "Yukon", abbreviation: "YT", gst_rate: 0.05, pst_rate: 0.00, hst_rate: 0.00 }
+]
+
+provinces_data.each do |province_attrs|
+  Province.find_or_create_by(abbreviation: province_attrs[:abbreviation]) do |province|
+    province.name = province_attrs[:name]
+    province.gst_rate = province_attrs[:gst_rate]
+    province.pst_rate = province_attrs[:pst_rate]
+    province.hst_rate = province_attrs[:hst_rate]
+  end
+end
+
+puts "Created #{Province.count} provinces with tax rates"

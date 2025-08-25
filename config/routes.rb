@@ -1,6 +1,16 @@
-# config/routes.rb - Simple working routes:
+# config/routes.rb
 
 Rails.application.routes.draw do
+  get "addresses/new"
+  get "addresses/create"
+  get "addresses/edit"
+  get "addresses/update"
+  get "addresses/destroy"
+  get "payments/new"
+  get "payments/create"
+  get "orders/index"
+  get "orders/show"
+  devise_for :users
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   
@@ -14,10 +24,20 @@ Rails.application.routes.draw do
   delete 'cart/remove/:product_id', to: 'shopping_cart#remove_item', as: 'cart_remove'
   delete 'cart/clear', to: 'shopping_cart#clear', as: 'cart_clear'
   
-  # Checkout routes
+  # Checkout and Payment routes
   get 'checkout', to: 'checkouts#new', as: 'checkout'
   post 'checkout', to: 'checkouts#create'
   get 'checkout/success/:id', to: 'checkouts#success', as: 'checkout_success'
+  
+  # Payment routes (for Stripe integration)
+  get 'payment', to: 'payments#new', as: 'payment'
+  post 'payment', to: 'payments#create', as: 'payments'
+  
+  # User orders
+  resources :orders, only: [:index, :show]
+  
+  # User addresses
+  resources :addresses, except: [:index, :show]
 
   # Category routes
   resources :categories, only: [:index, :show], param: :slug

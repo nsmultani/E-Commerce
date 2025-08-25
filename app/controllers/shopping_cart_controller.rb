@@ -34,9 +34,4 @@ class ShoppingCartController < ApplicationController
     redirect_to cart_path, notice: "Cart cleared!"
   end
 
-  private
-
-  def initialize_cart
-    @cart = ShoppingCart.new(session)
-  end
 end
