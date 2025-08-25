@@ -193,3 +193,98 @@ if Product.count > 0
   
   puts "Updated products for filtering demonstration"
 end
+
+# db/seeds.rb - Add more products at the end to demonstrate pagination:
+
+# Add more products to demonstrate pagination (if we have less than 20)
+additional_products = [
+  {
+    name: "Portable Camp Chair",
+    description: "Lightweight folding camp chair with cup holder and carry bag. Perfect for camping, festivals, and outdoor events.",
+    sku: "CHAIR-CAMP-PORT",
+    price: 34.99,
+    stock_quantity: 20,
+    weight: 2.3,
+    dimensions: "20 x 20 x 32 inches"
+  },
+  {
+    name: "Solar Power Bank 20000mAh",
+    description: "High-capacity solar power bank with wireless charging and LED flashlight. Perfect for extended outdoor adventures.",
+    sku: "POWER-SOLAR-20K",
+    price: 89.99,
+    stock_quantity: 12,
+    weight: 1.1,
+    dimensions: "6 x 3 x 1 inches",
+    featured: true
+  },
+  {
+    name: "Insect Repellent Spray",
+    description: "DEET-free natural insect repellent effective against mosquitoes, ticks, and flies. Safe for the whole family.",
+    sku: "REPEL-NATURAL-SP",
+    price: 12.99,
+    stock_quantity: 45,
+    weight: 0.4,
+    dimensions: "7 x 2 x 2 inches"
+  },
+  {
+    name: "Waterproof Dry Bag 30L",
+    description: "Completely waterproof dry bag with roll-top closure. Keep your gear dry during water activities and wet weather.",
+    sku: "BAG-DRY-30L",
+    price: 24.99,
+    stock_quantity: 18,
+    weight: 0.6,
+    dimensions: "22 x 12 inches"
+  },
+  {
+    name: "Portable Camping Hammock",
+    description: "Ultra-light parachute nylon hammock with tree straps included. Sets up in minutes for the perfect outdoor rest spot.",
+    sku: "HAMMOCK-CAMP-UL",
+    price: 54.99,
+    stock_quantity: 15,
+    weight: 1.8,
+    dimensions: "10 x 6 x 6 inches (packed)"
+  },
+  {
+    name: "First Aid Kit Complete",
+    description: "Comprehensive first aid kit with 200+ pieces including bandages, antiseptic, pain relievers, and emergency supplies.",
+    sku: "KIT-FIRST-AID",
+    price: 39.99,
+    stock_quantity: 25,
+    weight: 1.2,
+    dimensions: "9 x 6 x 3 inches"
+  }
+]
+
+additional_products.each do |product_attrs|
+  Product.find_or_create_by(sku: product_attrs[:sku]) do |product|
+    product.assign_attributes(product_attrs)
+  end
+end
+
+puts "Total products: #{Product.count}"
+
+# db/seeds.rb - Add category assignments for new products:
+
+# Assign categories to new products
+new_product_assignments = {
+  "CHAIR-CAMP-PORT" => ["Camping Equipment"],
+  "POWER-SOLAR-20K" => ["Survival & Emergency", "Camping Equipment"],
+  "REPEL-NATURAL-SP" => ["Camping Equipment", "Survival & Emergency"],
+  "BAG-DRY-30L" => ["Hiking & Backpacking"],
+  "HAMMOCK-CAMP-UL" => ["Camping Equipment"],
+  "KIT-FIRST-AID" => ["Survival & Emergency"]
+}
+
+new_product_assignments.each do |sku, category_names|
+  product = Product.find_by(sku: sku)
+  next unless product
+  
+  category_names.each do |category_name|
+    category = Category.find_by(name: category_name)
+    next unless category
+    
+    ProductCategory.find_or_create_by(product: product, category: category)
+  end
+end
+
+puts "Assigned categories to new products"

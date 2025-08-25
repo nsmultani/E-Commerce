@@ -106,26 +106,8 @@
   <% end %>
 </div>
 
-<!-- Pagination -->
-<% if @total_pages > 1 %>
-  <div class="pagination">
-    <% if @current_page > 1 %>
-      <%= link_to "Previous", category_path(@category.slug, params.permit!.merge(page: @current_page - 1)) %>
-    <% end %>
-    
-    <% (1..@total_pages).each do |page| %>
-      <% if page == @current_page %>
-        <span class="current"><%= page %></span>
-      <% else %>
-        <%= link_to page, category_path(@category.slug, params.permit!.merge(page: page)) %>
-      <% end %>
-    <% end %>
-    
-    <% if @current_page < @total_pages %>
-      <%= link_to "Next", category_path(@category.slug, params.permit!.merge(page: @current_page + 1)) %>
-    <% end %>
-  </div>
-<% end %>
+<!-- Kaminari Pagination -->
+<%= paginate @products %>
 
 <!-- No products message -->
 <% if @products.empty? %>

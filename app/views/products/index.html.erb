@@ -65,7 +65,7 @@
     <div style="text-align: center; margin-bottom: 20px;">
       <% if params[:search].present? || params[:category_id].present? || params[:featured].present? || params[:on_sale].present? || params[:new_products].present? || params[:recently_updated].present? %>
         <h3>
-          Showing <%= @total_count %> 
+          Showing <%= @products.total_count %> 
           <%= 'search results' if params[:search].present? %>
           <% if params[:category_id].present? %>
             <% category = Category.find_by(id: params[:category_id]) %>
@@ -76,8 +76,10 @@
           <%= 'new products' if params[:new_products] == 'true' %>
           <%= 'recently updated products' if params[:recently_updated] == 'true' %>
         </h3>
+        <p style="color: #7f8c8d;">Page <%= @products.current_page %> of <%= @products.total_pages %></p>
       <% else %>
-        <h3>All Products (<%= @total_count %>)</h3>
+        <h3>All Products (<%= @products.total_count %>)</h3>
+        <p style="color: #7f8c8d;">Page <%= @products.current_page %> of <%= @products.total_pages %></p>
       <% end %>
     </div>
 
@@ -137,26 +139,11 @@
       <% end %>
     </div>
 
+    <!-- Pagination Info -->
+<%= render 'shared/pagination_info', collection: @products %>
+
     <!-- Simple Pagination -->
-    <% if @total_pages > 1 %>
-      <div class="pagination">
-        <% if @current_page > 1 %>
-          <%= link_to "Previous", products_path(params.permit!.merge(page: @current_page - 1)) %>
-        <% end %>
-        
-        <% (1..@total_pages).each do |page| %>
-          <% if page == @current_page %>
-            <span class="current"><%= page %></span>
-          <% else %>
-            <%= link_to page, products_path(params.permit!.merge(page: page)) %>
-          <% end %>
-        <% end %>
-        
-        <% if @current_page < @total_pages %>
-          <%= link_to "Next", products_path(params.permit!.merge(page: @current_page + 1)) %>
-        <% end %>
-      </div>
-    <% end %>
+    <%= paginate @products %>
 
     <!-- No products message -->
     <% if @products.empty? %>

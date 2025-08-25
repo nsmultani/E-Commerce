@@ -1,0 +1,13 @@
+<!-- app/views/shared/_pagination_info.html.erb - Create this partial: -->
+
+<div class="pagination-info" style="text-align: center; margin: 15px 0; color: #7f8c8d; font-size: 14px;">
+  <% if collection.respond_to?(:current_page) %>
+    Showing 
+    <strong><%= collection.offset_value + 1 %></strong>
+    to 
+    <strong><%= collection.offset_value + collection.length %></strong>
+    of 
+    <strong><%= collection.total_count %></strong>
+    <%= collection.total_count == 1 ? 'product' : 'products' %>
+  <% end %>
+</div>

@@ -1,4 +1,4 @@
-# app/controllers/categories_controller.rb - Add new filters:
+# app/controllers/categories_controller.rb - Use Kaminari:
 
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:show]
@@ -23,15 +23,8 @@ class CategoriesController < ApplicationController
       @products = @products.where("LOWER(products.name) LIKE ? OR LOWER(products.description) LIKE ?", search_term, search_term)
     end
     
-    # Pagination
-    @total_count = @products.count
-    per_page = 12
-    page = (params[:page] || 1).to_i
-    offset = (page - 1) * per_page
-    
-    @products = @products.order('products.name').limit(per_page).offset(offset)
-    @current_page = page
-    @total_pages = (@total_count.to_f / per_page).ceil
+    # Use Kaminari for pagination
+    @products = @products.order('products.name').page(params[:page]).per(12)
   end
 
   private

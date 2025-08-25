@@ -1,0 +1,11 @@
+
+<% if page.current? %>
+  <span class="current" style="display: inline-block; padding: 8px 12px; margin: 0 3px; background-color: #3498db; color: white; border: 1px solid #3498db; border-radius: 4px; font-weight: bold;">
+    <%= page %>
+  </span>
+<% else %>
+  <%= link_to page, url, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)), 
+              style: "display: inline-block; padding: 8px 12px; margin: 0 3px; background-color: white; color: #2c3e50; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; transition: all 0.3s;",
+              onmouseover: "this.style.backgroundColor='#3498db'; this.style.color='white'; this.style.borderColor='#3498db';",
+              onmouseout: "this.style.backgroundColor='white'; this.style.color='#2c3e50'; this.style.borderColor='#ddd';" %>
+<% end %>
