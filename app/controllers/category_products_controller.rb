@@ -1,0 +1,35 @@
+# app/controllers/category_products_controller.rb
+
+class CategoryProductsController < ApplicationController
+  before_action :set_category
+
+  def index
+    @products = @category.products.active.includes(:categories, images_attachments: :blob)
+    
+    # Apply filters if present
+    @products = @products.featured if params[:featured] == 'true'
+    @products = @products.on_sale if params[:on_sale] == 'true'
+    
+    # Apply search within category
+    if params[:search].present?
+      search_term = "%#{params[:search].downcase}%"
+      @products = @products.where("LOWER(products.name) LIKE ? OR LOWER(products.description) LIKE ?", search_term, search_term)
+    end
+    
+    # Pagination
+    @total_count = @products.count
+    per_page = 12
+    page = (params[:page] || 1).to_i
+    offset = (page - 1) * per_page
+    
+    @products = @products.order('products.name').limit(per_page).offset(offset)
+    @current_page = page
+    @total_pages = (@total_count.to_f / per_page).ceil
+  end
+
+  private
+
+  def set_category
+    @category = Category.find_by!(slug: params[:slug])
+  end
+end

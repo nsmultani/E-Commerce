@@ -274,11 +274,12 @@
       <div class="container">
         <h1><%= link_to "Northern Lights Outdoor Gear", products_path, style: "color: white; text-decoration: none;" %></h1>
         <nav class="nav">
-          <%= link_to "Shop All Products", products_path, class: ("active" if current_page?(products_path)) %>
-          <%= link_to "About", about_path, class: ("active" if current_page?(about_path)) %>
-          <%= link_to "Contact", contact_path, class: ("active" if current_page?(contact_path)) %>
-          <%= link_to "Admin", admin_root_path %>
-        </nav>
+  <%= link_to "Shop All Products", products_path, class: ("active" if current_page?(products_path)) %>
+  <%= link_to "Browse Categories", categories_path, class: ("active" if current_page?(categories_path)) %>
+  <%= link_to "About", about_path, class: ("active" if current_page?(about_path)) %>
+  <%= link_to "Contact", contact_path, class: ("active" if current_page?(contact_path)) %>
+  <%= link_to "Admin", admin_root_path %>
+</nav>
       </div>
     </div>
     
