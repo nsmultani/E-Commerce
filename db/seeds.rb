@@ -117,4 +117,66 @@ products_data.each do |product_attrs|
   end
 end
 
-puts "Created #{Product.count} products"
+# db/seeds.rb - Add this at the end:
+
+# Create static pages with initial content
+StaticPage.find_or_create_by(page_name: 'about') do |page|
+  page.title = 'About Northern Lights Outdoor Gear'
+  page.content = %Q{
+<p>Welcome to Northern Lights Outdoor Gear, your premier destination for high-quality outdoor equipment and adventure gear.</p>
+
+<p>Founded in 2015 in the heart of Winnipeg, Manitoba, we've been serving outdoor enthusiasts across Canada for over 9 years. What started as a small family-owned business has grown into a thriving enterprise with 12 dedicated team members who share a passion for the great outdoors.</p>
+
+<h3>Our Mission</h3>
+<p>At Northern Lights Outdoor Gear, we believe that everyone deserves access to reliable, high-quality equipment that enhances their outdoor adventures. Whether you're planning a weekend camping trip, embarking on a multi-day hiking expedition, or gearing up for winter sports, we have the expertise and equipment to help you succeed.</p>
+
+<h3>What We Offer</h3>
+<p>Our extensive inventory includes:</p>
+<ul>
+<li>Premium camping equipment and tents</li>
+<li>Professional-grade hiking and backpacking gear</li>
+<li>Winter sports equipment and apparel</li>
+<li>Survival and emergency equipment</li>
+<li>Outdoor clothing and accessories</li>
+</ul>
+
+<h3>Our Commitment</h3>
+<p>We are committed to providing not just products, but expertise. Our knowledgeable staff are experienced outdoor enthusiasts who can help you choose the right equipment for your adventures. We stand behind every product we sell with our satisfaction guarantee.</p>
+
+<p>Join thousands of satisfied customers who trust Northern Lights Outdoor Gear for their outdoor adventures. Let us help you explore the great outdoors with confidence!</p>
+  }
+  page.meta_description = 'Learn about Northern Lights Outdoor Gear - your trusted outdoor equipment provider in Winnipeg, Manitoba since 2015.'
+end
+
+StaticPage.find_or_create_by(page_name: 'contact') do |page|
+  page.title = 'Contact Northern Lights Outdoor Gear'
+  page.content = %Q{
+<p>We'd love to hear from you! Get in touch with Northern Lights Outdoor Gear for product questions, order support, or just to chat about your next outdoor adventure.</p>
+
+<h3>Store Information</h3>
+<p><strong>Northern Lights Outdoor Gear</strong><br>
+123 Adventure Way<br>
+Winnipeg, MB R3C 1A1<br>
+Canada</p>
+
+<p><strong>Phone:</strong> (204) 555-GEAR (4327)<br>
+<strong>Email:</strong> info@northernlights.com<br>
+<strong>Website:</strong> www.northernlightsoutdoor.com</p>
+
+<h3>Store Hours</h3>
+<p><strong>Monday - Friday:</strong> 9:00 AM - 8:00 PM<br>
+<strong>Saturday:</strong> 8:00 AM - 6:00 PM<br>
+<strong>Sunday:</strong> 10:00 AM - 5:00 PM</p>
+
+<h3>Get Directions</h3>
+<p>Located in the heart of downtown Winnipeg, we're easily accessible by car or public transit. Parking is available in front of the store and in the adjacent lot.</p>
+
+<h3>Expert Advice</h3>
+<p>Our experienced team is here to help you choose the right gear for your adventures. Whether you're a beginner or a seasoned outdoor enthusiast, we provide personalized recommendations based on your specific needs and budget.</p>
+
+<p>Visit us in-store or reach out online - we're here to help make your outdoor adventures unforgettable!</p>
+  }
+  page.meta_description = 'Contact Northern Lights Outdoor Gear in Winnipeg, MB. Get expert advice on outdoor equipment, store hours, and location information.'
+end
+
+puts "Created static pages: About and Contact"

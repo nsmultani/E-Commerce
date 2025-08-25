@@ -1,6 +1,4 @@
-//= link_tree ../images
-//= link_directory ../stylesheets .css
-//= link_directory ../javascripts .js
+// app/assets/config/manifest.js - Replace with this simple version:
 
-// Link the compiled CSS from SCSS
-//= link active_admin.css
+//= link_tree ../images
+//= link application.css

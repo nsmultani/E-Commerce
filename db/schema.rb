@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_25_082844) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_25_083832) do
   create_table "active_admin_comments", force: :cascade do |t|
     t.string "namespace"
     t.text "body"
@@ -83,6 +83,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_25_082844) do
     t.index ["is_active"], name: "index_products_on_is_active"
     t.index ["name"], name: "index_products_on_name"
     t.index ["sku"], name: "index_products_on_sku", unique: true
+  end
+
+  create_table "static_pages", force: :cascade do |t|
+    t.string "page_name", null: false
+    t.string "title", null: false
+    t.text "content"
+    t.string "meta_description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_name"], name: "index_static_pages_on_page_name", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
