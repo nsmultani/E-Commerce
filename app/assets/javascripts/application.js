@@ -1,6 +1,5 @@
-// app/assets/javascripts/application.js
+// app/assets/javascripts/application.js - Replace content with:
 
 //= require rails-ujs
-//= require jquery
-//= require bootstrap-sprockets
+//= require activestorage
 //= require_tree .

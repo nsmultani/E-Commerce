@@ -53,9 +53,9 @@ gem 'image_processing', '~> 1.2'
 gem 'kaminari'
 
 # Styling
-gem 'bootstrap', '~> 5.1'
+# gem 'bootstrap', '~> 5.1'
 gem 'sassc-rails'
-gem 'jquery-rails'
+# gem 'jquery-rails'
 
 # Payment processing
 gem 'stripe'

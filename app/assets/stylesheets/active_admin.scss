@@ -1,0 +1,37 @@
+// app/assets/stylesheets/active_admin.scss - Replace the content with:
+
+// Active Admin's SCSS
+@import "active_admin/mixins";
+@import "active_admin/base";
+
+// Overrides
+.active_admin {
+  font-family: Arial, sans-serif;
+}
+
+.active_admin .header {
+  background-color: #5e6469;
+  padding: 10px;
+}
+
+.active_admin .form {
+  padding: 20px;
+}
+
+.active_admin input[type="email"],
+.active_admin input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.active_admin input[type="submit"] {
+  background-color: #5e6469;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
