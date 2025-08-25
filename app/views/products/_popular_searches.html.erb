@@ -1,0 +1,10 @@
+<% unless params[:search].present? %>
+  <div class="popular-searches" style="text-align: center; margin: 15px 0; font-size: 14px;">
+    <span style="color: #7f8c8d; margin-right: 10px;">Popular searches:</span>
+    <%= link_to "tent", products_path(search: "tent"), style: "color: #3498db; text-decoration: none; margin: 0 5px;" %>
+    <%= link_to "backpack", products_path(search: "backpack"), style: "color: #3498db; text-decoration: none; margin: 0 5px;" %>
+    <%= link_to "waterproof", products_path(search: "waterproof"), style: "color: #3498db; text-decoration: none; margin: 0 5px;" %>
+    <%= link_to "camping", products_path(search: "camping"), style: "color: #3498db; text-decoration: none; margin: 0 5px;" %>
+    <%= link_to "survival", products_path(search: "survival"), style: "color: #3498db; text-decoration: none; margin: 0 5px;" %>
+  </div>
+<% end %>

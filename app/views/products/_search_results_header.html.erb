@@ -1,0 +1,28 @@
+<!-- app/views/products/_search_results_header.html.erb - Create this partial: -->
+
+<% if params[:search].present? %>
+  <div class="search-results-header" style="background-color: #e8f4fd; border: 1px solid #3498db; border-radius: 6px; padding: 15px; margin-bottom: 20px;">
+    <h4 style="margin: 0 0 10px 0; color: #2c3e50;">
+      Search Results for: "<strong><%= params[:search] %></strong>"
+      <% if params[:search_category_id].present? %>
+        <% search_category = Category.find_by(id: params[:search_category_id]) %>
+        <% if search_category %>
+          in category "<strong><%= search_category.full_name %></strong>"
+        <% end %>
+      <% end %>
+    </h4>
+    
+    <div style="color: #7f8c8d; font-size: 14px;">
+      Found <%= pluralize(@products.total_count, 'product') %> 
+      <% if @products.total_pages > 1 %>
+        • Page <%= @products.current_page %> of <%= @products.total_pages %>
+      <% end %>
+    </div>
+    
+    <div style="margin-top: 10px;">
+      <%= link_to "Clear search", products_path, style: "color: #e74c3c; font-size: 14px; text-decoration: none;" %>
+      <span style="color: #ddd; margin: 0 10px;">|</span>
+      <%= link_to "Search in all categories", products_path(search: params[:search]), style: "color: #3498db; font-size: 14px; text-decoration: none;" if params[:search_category_id].present? %>
+    </div>
+  </div>
+<% end %>

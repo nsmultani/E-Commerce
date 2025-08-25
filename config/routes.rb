@@ -1,10 +1,15 @@
+# config/routes.rb - Add search route:
+
 Rails.application.routes.draw do
-  get "category_products/index"
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   
   # Product routes
-  resources :products, only: [:index, :show]
+  resources :products, only: [:index, :show] do
+    collection do
+      get :search
+    end
+  end
   
   # Category routes for navigation
   resources :categories, only: [:index, :show], param: :slug do

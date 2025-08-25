@@ -1,4 +1,4 @@
-<!-- app/views/products/index.html.erb - Update the filter bar: -->
+<!-- app/views/products/index.html.erb - Enhanced search section: -->
 
 <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
   
@@ -37,17 +37,61 @@
   <!-- Main Content -->
   <div class="main-content">
     
-    <!-- Search Bar -->
-    <div class="search-bar">
+    <!-- Enhanced Search Bar - Meeting Section 2.6 Requirements -->
+    <div class="search-bar" style="background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+      <h3 style="margin-top: 0; color: #2c3e50; text-align: center; margin-bottom: 20px;">Search Products</h3>
+      
       <%= form_with url: products_path, method: :get, local: true do |f| %>
-        <%= f.text_field :search, placeholder: "Search products...", value: params[:search] %>
-        <%= f.select :category_id, options_from_collection_for_select(@categories, :id, :name, params[:category_id]), 
-                     { include_blank: "All Categories" } %>
-        <%= f.submit "Search", class: "search-button" %>
+        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: end;">
+          
+          <!-- Keyword Search -->
+          <div>
+            <%= f.label :search, "Search Keywords:", style: "display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;" %>
+            <%= f.text_field :search, placeholder: "Enter product name or description...", value: params[:search],
+                            style: "width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;" %>
+          </div>
+          
+          <!-- Category Selection for Search -->
+          <div>
+            <%= f.label :search_category_id, "Search Within Category:", style: "display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;" %>
+            <%= f.select :search_category_id, 
+                        options_from_collection_for_select(@all_categories, :id, :full_name, params[:search_category_id]), 
+                        { include_blank: "All Categories" },
+                        { style: "padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;" } %>
+          </div>
+          
+          <!-- Search Button -->
+          <div>
+            <%= f.submit "Search Products", style: "padding: 12px 20px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; white-space: nowrap;" %>
+          </div>
+        </div>
+
+        <!-- Popular Searches -->
+<%= render 'popular_searches' %>
+
+ <!-- Search Results Header -->
+<%= render 'search_results_header' %>
+        
+        <!-- Clear Search -->
+        <% if params[:search].present? || params[:search_category_id].present? %>
+          <div style="text-align: center; margin-top: 15px;">
+            <%= link_to "Clear Search", products_path, style: "color: #e74c3c; text-decoration: none; font-size: 14px;" %>
+          </div>
+        <% end %>
       <% end %>
+      
+      <!-- Search Tips -->
+      <div style="margin-top: 15px; font-size: 14px; color: #7f8c8d; text-align: center;">
+        <strong>Search Tips:</strong> 
+        Try keywords like "tent", "backpack", "waterproof", or "camping"
+        • Use category dropdown to narrow your search
+        • Leave category blank to search all products
+      </div>
     </div>
 
-    <!-- Enhanced Filter Bar -->
+   
+
+    <!-- Filter Bar -->
     <div class="filter-bar" style="margin-bottom: 20px;">
       <%= link_to "All Products", products_path, 
                   class: (params[:featured].blank? && params[:on_sale].blank? && params[:new_products].blank? && params[:recently_updated].blank? && params[:category_id].blank? ? "active" : "") %>
@@ -61,12 +105,20 @@
                   class: (params[:recently_updated] == 'true' ? "active" : "") %>
     </div>
 
-    <!-- Results Info -->
+    <!-- Search Results Info -->
     <div style="text-align: center; margin-bottom: 20px;">
-      <% if params[:search].present? || params[:category_id].present? || params[:featured].present? || params[:on_sale].present? || params[:new_products].present? || params[:recently_updated].present? %>
+      <% if params[:search].present? %>
+        <h3 style="color: #2c3e50;">
+          Search Results for "<%= params[:search] %>"
+          <% if params[:search_category_id].present? %>
+            <% search_category = Category.find_by(id: params[:search_category_id]) %>
+            <%= "in #{search_category.full_name}" if search_category %>
+          <% end %>
+        </h3>
+        <p style="color: #7f8c8d;">Found <%= @products.total_count %> <%= @products.total_count == 1 ? 'product' : 'products' %></p>
+      <% elsif params[:category_id].present? || params[:featured].present? || params[:on_sale].present? || params[:new_products].present? || params[:recently_updated].present? %>
         <h3>
           Showing <%= @products.total_count %> 
-          <%= 'search results' if params[:search].present? %>
           <% if params[:category_id].present? %>
             <% category = Category.find_by(id: params[:category_id]) %>
             <%= "in #{category.name}" if category %>
@@ -76,12 +128,13 @@
           <%= 'new products' if params[:new_products] == 'true' %>
           <%= 'recently updated products' if params[:recently_updated] == 'true' %>
         </h3>
-        <p style="color: #7f8c8d;">Page <%= @products.current_page %> of <%= @products.total_pages %></p>
       <% else %>
         <h3>All Products (<%= @products.total_count %>)</h3>
-        <p style="color: #7f8c8d;">Page <%= @products.current_page %> of <%= @products.total_pages %></p>
       <% end %>
     </div>
+
+    <!-- Pagination Info -->
+    <%= render 'shared/pagination_info', collection: @products %>
 
     <!-- Products Grid -->
     <div class="products-grid">
@@ -121,6 +174,14 @@
                 </div>
               </div>
               
+              <!-- Highlight search terms in product name and description -->
+              <% if params[:search].present? %>
+                <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px; font-style: italic;">
+                  <% description_excerpt = truncate(product.description, length: 100) %>
+                  <%= highlight(description_excerpt, params[:search], highlighter: '<mark style="background-color: #f1c40f; padding: 1px 3px;">\1</mark>') %>
+                </div>
+              <% end %>
+              
               <div class="product-price <%= 'on-sale' if product.on_sale? %>">
                 <% if product.on_sale? %>
                   <%= number_to_currency(product.sale_price) %>
@@ -139,18 +200,20 @@
       <% end %>
     </div>
 
-    <!-- Pagination Info -->
-<%= render 'shared/pagination_info', collection: @products %>
-
-    <!-- Simple Pagination -->
+    <!-- Kaminari Pagination -->
     <%= paginate @products %>
 
     <!-- No products message -->
     <% if @products.empty? %>
       <div style="text-align: center; margin: 50px 0;">
         <h3>No products found</h3>
-        <p>Try adjusting your search or filter criteria.</p>
-        <%= link_to "Browse All Products", products_path, style: "color: #3498db;" %>
+        <% if params[:search].present? %>
+          <p>No products found for "<%= params[:search] %>"<%= " in #{@search_category.full_name}" if @search_category %></p>
+          <p>Try a different search term or category, or <%= link_to "browse all products", products_path, style: "color: #3498db;" %></p>
+        <% else %>
+          <p>Try adjusting your search or filter criteria.</p>
+          <%= link_to "Browse All Products", products_path, style: "color: #3498db;" %>
+        <% end %>
       </div>
     <% end %>
     
