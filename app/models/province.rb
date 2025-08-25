@@ -1,6 +1,8 @@
 # app/models/province.rb
 
 class Province < ApplicationRecord
+  has_many :addresses, dependent: :restrict_with_error
+
   validates :name, presence: true
   validates :abbreviation, presence: true, uniqueness: true
   validates :gst_rate, presence: true, numericality: { greater_than_or_equal_to: 0 }
