@@ -1,11 +1,7 @@
-# app/models/category.rb - Update the ransackable methods:
-
 class Category < ApplicationRecord
-  # Self-referential association for subcategories
   has_many :subcategories, class_name: 'Category', foreign_key: 'parent_id', dependent: :destroy
   belongs_to :parent_category, class_name: 'Category', foreign_key: 'parent_id', optional: true
 
-  # Many-to-many relationship with products
   has_many :product_categories, dependent: :destroy
   has_many :products, through: :product_categories
 
