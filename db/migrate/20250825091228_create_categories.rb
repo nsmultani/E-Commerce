@@ -1,6 +1,3 @@
-# We can add this to the categories migration or create a new one
-# Add this to the end of the CreateCategories migration:
-
 class CreateCategories < ActiveRecord::Migration[8.0]
   def change
     create_table :categories do |t|

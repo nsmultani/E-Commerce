@@ -1,4 +1,3 @@
-# db/migrate/[timestamp]_create_product_categories.rb - Replace content with:
 
 class CreateProductCategories < ActiveRecord::Migration[8.0]
   def change

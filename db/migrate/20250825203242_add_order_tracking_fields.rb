@@ -1,4 +1,3 @@
-# Replace the content of your add_order_tracking_fields.rb file with:
 
 class AddOrderTrackingFields < ActiveRecord::Migration[8.0]
   def change
