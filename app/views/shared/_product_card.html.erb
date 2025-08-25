@@ -1,0 +1,101 @@
+<!-- app/views/shared/_product_card.html.erb - Partial for DRY views (4.1.4) -->
+
+<div class="product-card" data-product-id="<%= product.id %>">
+  <%= link_to product_path(product), class: "text-decoration-none" do %>
+    <!-- Product Image -->
+    <% if product.primary_image.present? %>
+      <%= image_tag product.primary_image, 
+                    alt: product.name, 
+                    class: "product-image",
+                    loading: "lazy" %>
+    <% else %>
+      <div class="product-image no-image">
+        <i class="fas fa-image"></i><br>
+        No Image Available
+      </div>
+    <% end %>
+    
+    <div class="product-info">
+      <!-- Product Categories -->
+      <% if product.categories.any? %>
+        <div class="product-categories">
+          <%= product.category_names %>
+        </div>
+      <% end %>
+      
+      <!-- Product Name -->
+      <h3 class="product-name">
+        <%= product.name %>
+      </h3>
+      
+      <!-- Product Badges -->
+      <div class="product-badges">
+        <%= product_badges(product) %>
+      </div>
+      
+      <!-- Search Highlight (if search term present) -->
+      <% if params[:search].present? && product.description.present? %>
+        <div class="search-excerpt text-muted">
+          <% description_excerpt = truncate(product.description, length: 100) %>
+          <%= highlight(description_excerpt, params[:search], 
+                       highlighter: '<mark class="bg-warning">\1</mark>').html_safe %>
+        </div>
+      <% end %>
+      
+      <!-- Product Price -->
+      <div class="product-price <%= 'on-sale' if product.on_sale? %>">
+        <% if product.on_sale? && product.sale_price.present? %>
+          <%= number_to_currency(product.sale_price) %>
+          <span class="original-price"><%= number_to_currency(product.price) %></span>
+          <% if product.price > product.sale_price %>
+            <div class="savings-badge">
+              <small class="text-success fw-bold">
+                Save <%= number_to_currency(product.price - product.sale_price) %>!
+              </small>
+            </div>
+          <% end %>
+        <% else %>
+          <%= number_to_currency(product.price) %>
+        <% end %>
+      </div>
+      
+      <!-- Stock Status -->
+      <div class="product-stock <%= product.in_stock? ? 'in-stock' : 'out-of-stock' %>">
+        <i class="fas <%= product.in_stock? ? 'fa-check-circle' : 'fa-times-circle' %>"></i>
+        <%= product.in_stock? ? "In Stock (#{product.stock_quantity})" : "Out of Stock" %>
+      </div>
+      
+      <!-- Product Rating (placeholder for future) -->
+      <div class="product-rating mt-2">
+        <% 5.times do |i| %>
+          <i class="fas fa-star text-warning"></i>
+        <% end %>
+        <small class="text-muted">(4.5/5 - 23 reviews)</small>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- Quick Add to Cart Button -->
+  <div class="p-3 pt-0">
+    <% if product.in_stock? %>
+      <%= form_with url: cart_add_path(product_id: product.id), 
+                    method: :post, 
+                    local: true, 
+                    class: "quick-add-form" do |f| %>
+        <%= f.hidden_field :quantity, value: 1 %>
+        <%= f.submit "Quick Add to Cart", 
+                     class: "quick-add-btn",
+                     data: { 
+                       product_id: product.id,
+                       product_name: product.name,
+                       disable_with: "Adding..."
+                     } %>
+      <% end %>
+    <% else %>
+      <button class="quick-add-btn" disabled>
+        <i class="fas fa-times"></i>
+        Out of Stock
+      </button>
+    <% end %>
+  </div>
+</div>
